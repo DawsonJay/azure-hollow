@@ -1,0 +1,152 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model Package {
+  id          String   @id @default(cuid())
+  name        String
+  duration    Int      // Duration in minutes
+  price       Float    // Price in dollars
+  description String?
+  isActive    Boolean  @default(true)
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  contactRequests ContactRequest[]
+  bookedSessions BookedSession[]
+
+  @@index([isActive])
+}
+
+model User {
+  id           String   @id @default(cuid())
+  email        String   @unique
+  passwordHash String
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
+}
+
+model AvailabilitySlot {
+  id        String   @id @default(cuid())
+  date      DateTime @db.Date
+  startTime String   // Format: "HH:MM" (e.g., "18:00")
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@unique([date, startTime])
+  @@index([date])
+}
+
+model ContactRequest {
+  id            String           @id @default(cuid())
+  clientName    String
+  clientEmail   String
+  message       String?
+  packageId    String
+  status        String           @default("pending") // pending, in_conversation, accepted, rejected, expired
+  preferredTimes Json            // Array of {date: string, times: string[]}
+  createdAt     DateTime         @default(now())
+  updatedAt     DateTime         @updatedAt
+  lastActivityAt DateTime?       // For expiration tracking
+
+  package Package @relation(fields: [packageId], references: [id])
+  messages Message[]
+  tokens Token[]
+  bookedSession BookedSession?
+
+  @@index([status])
+  @@index([createdAt])
+  @@index([lastActivityAt])
+}
+
+model Message {
+  id             String         @id @default(cuid())
+  requestId      String
+  senderEmail   String         // Client email or site email
+  senderType     String         // "client" or "friend" or "system"
+  content        String
+  subject        String?       // For email threading
+  requestIdInSubject String?    // Parsed request ID from subject
+  createdAt      DateTime       @default(now())
+
+  request ContactRequest @relation(fields: [requestId], references: [id], onDelete: Cascade)
+
+  @@index([requestId])
+  @@index([createdAt])
+}
+
+model Token {
+  id           String         @id @default(cuid())
+  requestId    String
+  token        String         @unique
+  confirmedDate DateTime?
+  confirmedTime String?       // Format: "HH:MM"
+  expiresAt   DateTime
+  isUsed      Boolean         @default(false)
+  createdAt   DateTime         @default(now())
+
+  request ContactRequest @relation(fields: [requestId], references: [id], onDelete: Cascade)
+  reservedSlot ReservedSlot?
+  payment Payment?
+
+  @@index([token])
+  @@index([expiresAt])
+  @@index([isUsed])
+}
+
+model ReservedSlot {
+  id        String   @id @default(cuid())
+  tokenId   String   @unique
+  date      DateTime @db.Date
+  startTime String   // Format: "HH:MM"
+  endTime   String   // Format: "HH:MM"
+  expiresAt DateTime // 24 hours from creation
+  createdAt DateTime @default(now())
+
+  token Token @relation(fields: [tokenId], references: [id], onDelete: Cascade)
+
+  @@index([date, startTime])
+  @@index([expiresAt])
+}
+
+model BookedSession {
+  id           String   @id @default(cuid())
+  requestId    String   @unique
+  date         DateTime @db.Date
+  startTime    String   // Format: "HH:MM"
+  endTime      String   // Format: "HH:MM"
+  packageId    String
+  clientName   String
+  clientEmail  String
+  zoomLink     String?
+  createdAt    DateTime @default(now())
+
+  request ContactRequest @relation(fields: [requestId], references: [id], onDelete: Cascade)
+  package Package @relation(fields: [packageId], references: [id])
+
+  @@index([date, startTime])
+}
+
+model Payment {
+  id            String   @id @default(cuid())
+  tokenId       String   @unique
+  stripePaymentId String @unique
+  amount        Float
+  currency     String   @default("usd")
+  status       String   // "succeeded", "failed", "refunded"
+  createdAt    DateTime @default(now())
+
+  token Token @relation(fields: [tokenId], references: [id], onDelete: Cascade)
+
+  @@index([stripePaymentId])
+  @@index([status])
+}
+
