@@ -31,20 +31,24 @@ Repository: https://github.com/DawsonJay/azure-hollow.git
 2. Click **"Variables"** tab
 3. Add these environment variables:
 
+**See `ENV_VARIABLES_GUIDE.md` for detailed instructions on where to get each value!**
+
 ```
-STRIPE_SECRET_KEY=sk_test_... (get from Stripe Dashboard)
-STRIPE_PUBLISHABLE_KEY=pk_test_... (get from Stripe Dashboard)
-STRIPE_WEBHOOK_SECRET=whsec_... (get after setting up webhook)
-RESEND_API_KEY=re_... (get from Resend Dashboard)
+STRIPE_SECRET_KEY=sk_test_... (Stripe Dashboard → Developers → API keys)
+STRIPE_PUBLISHABLE_KEY=pk_test_... (Stripe Dashboard → Developers → API keys)
+STRIPE_WEBHOOK_SECRET=whsec_... (Get AFTER setting up webhook - see step 7)
+RESEND_API_KEY=re_... (Resend Dashboard → API Keys)
 EMAIL_FROM=bookings@azhollow.com
-ADMIN_EMAIL=jessica@example.com (Jessica's email)
-ADMIN_MASTER_PASSWORD=your-secure-password-here
-NEXT_PUBLIC_BASE_URL=https://your-app.up.railway.app (Railway will show this)
+ADMIN_EMAIL=jessica@example.com (Jessica's actual email)
+ADMIN_MASTER_PASSWORD=your-secure-password-here (choose a strong password)
+NEXT_PUBLIC_BASE_URL=https://your-app.up.railway.app (Railway shows this after deploy)
 ```
 
 **Important:** 
 - `DATABASE_URL` is **auto-provided** - don't add it manually!
 - `NEXT_PUBLIC_BASE_URL` - Get this from Railway after first deploy
+- `STRIPE_WEBHOOK_SECRET` - Get this after step 7 (webhook setup)
+- **For detailed steps on getting each key, see `ENV_VARIABLES_GUIDE.md`**
 
 ### 4. Wait for First Deploy
 
