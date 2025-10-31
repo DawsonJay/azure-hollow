@@ -172,13 +172,27 @@ All design documentation is in the `design-docs/` folder:
 - `design-docs/DESIGN_REFINEMENTS.md` - Design refinement proposals
 - `design-docs/DESIGN_EVALUATION.md` - Design plan evaluation and assessment
 
+## Deployment
+
+**Ready for Railway deployment!** 
+
+See `DEPLOYMENT.md` for complete deployment instructions.
+
+Quick steps:
+1. Push this repo to GitHub
+2. Create Railway project → Deploy from GitHub
+3. Add PostgreSQL service (database auto-configured)
+4. Set environment variables in Railway dashboard
+5. Railway auto-deploys on push to main branch
+
+**Health Check:** `/api/health` - Monitors database connectivity
+
 ## Next Steps
 
+- [ ] Push to GitHub repository
+- [ ] Deploy to Railway (see `DEPLOYMENT.md`)
 - [ ] Complete Figma design
 - [ ] Build frontend components (landing page, order page, admin pages)
 - [ ] Implement authentication (admin login)
-- [ ] Set up Railway account and project
-- [ ] Deploy to Railway (web service + PostgreSQL)
 - [ ] Configure email service (Resend)
 - [ ] Set up Stripe account and webhooks
-- [ ] Configure webhook URLs (Stripe, Resend) to Railway URL
